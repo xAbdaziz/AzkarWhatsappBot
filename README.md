@@ -6,13 +6,17 @@
 
 
 ## Table of contents
-
+- [Warning](#warning)
 - [Quick start](#quick-start)
 - [Bugs and feature requests](#bugs-and-feature-requests)
 - [Thanks](#thanks)
 - [License](#copyright-and-license)
 - [Legal](#legal)
 
+
+## Warning
+Do NOT use this Software with your personal phone number, you might get banned.
+I'm not responsible in case you get banned.
 
 ## Quick start
 
