@@ -48,10 +48,10 @@ func Fetch(URL string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func FetchZikr(ZikrCode string) string {
-	// Check https://github.com/nawafalqari/azkar-api to see Zikr codes
+func FetchZikr(ZikrType string) string {
+	// Check https://ayah.nawafdev.com/docs to see Zikr Types
 
-	body, err := Fetch("https://azkar-api.nawafhq.repl.co/zekr?" + ZikrCode)
+	body, err := Fetch("https://ayah.nawafdev.com/api/dekr?types=" + ZikrType)
 	if err != nil {
 		panic(err)
 	}

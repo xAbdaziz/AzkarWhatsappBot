@@ -10,7 +10,7 @@
 - [Quick start](#quick-start)
 - [Bugs and feature requests](#bugs-and-feature-requests)
 - [Thanks](#thanks)
-- [License](#copyright-and-license)
+- [License](#license)
 - [Legal](#legal)
 
 
@@ -28,14 +28,14 @@ I'm not responsible in case you get banned.
 
 ## Bugs and feature requests
 
-Have a bug or a feature request? Please first search for existing and closed issues. If your problem or idea is not addressed yet, [please open a new issue](https://reponame/issues/new).
+Have a bug or a feature request? Please first search for existing and closed issues. If your problem or idea is not addressed yet, [please open a new issue](https://github.com/xAbdaziz/AzkarWhatsappBot/issues/new).
 
 ## Thanks
 
 Thanks to
-	- [tulir](https://github.com/tulir/whatsmeow)
-	- [AlAdhan](https://github.com/islamic-network/api.aladhan.com)
-	- [nawafalqari](https://github.com/nawafalqari/azkar-api)
+- [tulir](https://github.com/tulir/whatsmeow)
+- [AlAdhan](https://github.com/islamic-network/api.aladhan.com)
+- [nawafalqari](https://github.com/nawafalqari/ayah)
 
 ## License
 Code and documentation copyright 2023 xAbdaziz. Code released under the [MIT License](https://github.com/xAbdaziz/AzkarWhatsappBot/blob/master/LICENSE).
