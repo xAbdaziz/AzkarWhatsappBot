@@ -25,7 +25,7 @@ func (bot *Bot) sendMessage(message string) {
 	for _, group := range groups {
 		group := group
 		go func() {
-			_, err := bot.Client.SendMessage(context.Background(), group.JID.ToNonAD(), "", &waProto.Message{
+			_, err := bot.Client.SendMessage(context.Background(), group.JID.ToNonAD(), &waProto.Message{
 				Conversation: proto.String(message),
 			})
 			if err != nil {

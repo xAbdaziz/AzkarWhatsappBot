@@ -29,7 +29,7 @@ func registerHandler(client *whatsmeow.Client) func(evt interface{}) {
 		case *events.JoinedGroup:
 			if len(v.Participants) > 1 {
 				if BotIsAdded(v.Participants, botNum) {
-					_, _ = client.SendMessage(context.Background(), v.JID.ToNonAD(), "", &waProto.Message{Conversation: proto.String(os.Getenv("WELCOME_MSG"))})
+					_, _ = client.SendMessage(context.Background(), v.JID.ToNonAD(), &waProto.Message{Conversation: proto.String(os.Getenv("WELCOME_MSG"))})
 				}
 			}
 			break
