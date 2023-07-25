@@ -4,8 +4,8 @@ import (
 	"AzkarWhatsappBot/libs"
 	"context"
 	"fmt"
-	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/mdp/qrterminal/v3"
 	"go.mau.fi/whatsmeow"
 	waProto "go.mau.fi/whatsmeow/binary/proto"
@@ -20,9 +20,10 @@ import (
 	"syscall"
 )
 
+var botNum = ""
+
 func registerHandler(client *whatsmeow.Client) func(evt interface{}) {
 	return func(evt interface{}) {
-		botNum := client.Store.ID.ToNonAD().String()
 		switch v := evt.(type) {
 
 		// Send a welcome message when added to a group
@@ -53,8 +54,8 @@ func main() {
 	store.DeviceProps.Os = proto.String("Windows")
 	store.DeviceProps.PlatformType = waProto.DeviceProps_DESKTOP.Enum()
 
-	dbLog := waLog.Stdout("Database", "INFO", true)
-	container, err := sqlstore.New("pgx", os.Getenv("DB_URL"), dbLog)
+	dbLog := waLog.Stdout("Database", "ERROR", true)
+	container, err := sqlstore.New("sqlite3", "file:db.sqlite?_foreign_keys=on", dbLog)
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +63,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	clientLog := waLog.Stdout("Client", "INFO", true)
+	clientLog := waLog.Stdout("Client", "ERROR", true)
 	client := whatsmeow.NewClient(deviceStore, clientLog)
 
 	eventHandler := registerHandler(client)
@@ -84,6 +85,7 @@ func main() {
 			}
 		}
 	} else {
+		botNum = client.Store.ID.ToNonAD().String()
 		// Already logged in, just connect
 		err = client.Connect()
 		if err != nil {
