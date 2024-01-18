@@ -15,8 +15,8 @@
 
 
 ## Warning
-Do NOT use this Software with your personal phone number, you might get banned.
-I'm not responsible in case you get banned.
+Do NOT use this software with your personal phone number, you might get banned.
+You are running this software on your OWN responsibility.
 
 ## Quick start
 
@@ -35,7 +35,6 @@ Have a bug or a feature request? Please first search for existing and closed iss
 Thanks to
 - [tulir](https://github.com/tulir/whatsmeow)
 - [AlAdhan](https://github.com/islamic-network/api.aladhan.com)
-- [nawafalqari](https://github.com/nawafalqari/ayah)
 
 ## License
 Code and documentation copyright 2023 xAbdaziz. Code released under the [MIT License](https://github.com/xAbdaziz/AzkarWhatsappBot/blob/master/LICENSE).

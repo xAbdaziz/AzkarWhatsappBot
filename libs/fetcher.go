@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 	"os"
 	"time"
 )
 
 type Zikr struct {
-	Content string `json:"content"`
+	ID      int    `json:"id"`
+	Content string `json:"zikr"`
 }
 
 type PrayerTimes struct {
@@ -48,21 +50,26 @@ func Fetch(URL string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func FetchZikr(ZikrType string) string {
-	// Check https://ayah.nawafdev.com/docs to see Zikr Types
-
-	body, err := Fetch("https://ayah.nawafdev.com/api/dekr?types=" + ZikrType)
+func FetchZikr() string {
+	// Read the JSON file
+	file, err := os.ReadFile("zikr.json")
 	if err != nil {
 		panic(err)
 	}
 
-	var zikr Zikr
-	err = json.Unmarshal(body, &zikr)
+	// Unmarshal the JSON data into a slice of Zikr
+	var zikrs []Zikr
+	err = json.Unmarshal(file, &zikrs)
 	if err != nil {
 		panic(err)
 	}
 
-	return zikr.Content
+	// Generate a random index and select a Zikr
+	rand.Seed(time.Now().UnixNano())
+	randomIndex := rand.Intn(len(zikrs))
+	selectedZikr := zikrs[randomIndex]
+
+	return selectedZikr.Content
 }
 
 func FetchPrayerTimes() PrayerTimes {

@@ -74,7 +74,7 @@ func Start(client *whatsmeow.Client) {
 
 		// Send Zikr every 2 hours
 		if (locTime.Hour()%4 == 0 || locTime.Hour()%4 == 2) && locTime.Minute() == 0 {
-			bot.sendMessage(FetchZikr("t"))
+			bot.sendMessage(FetchZikr())
 		}
 	}
 }
