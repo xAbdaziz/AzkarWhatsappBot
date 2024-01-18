@@ -10,71 +10,59 @@ import (
 func Start(client *whatsmeow.Client) {
 	bot := BotClient(client)
 	pt := FetchPrayerTimes()
-	if pt.Code != 200 {
-		fmt.Println("Couldn't fetch Prayer times, did you correctly fill config.env?")
-		os.Exit(1)
-		return
-	}
 
 	city := os.Getenv("CITY")
-	loc, _ := time.LoadLocation(pt.Data.Meta.Timezone)
+	loc, err := time.LoadLocation(pt.Data.Meta.Timezone)
+	if err != nil {
+		fmt.Println("Error loading location:", err)
+		os.Exit(1)
+	}
 
-	// Create a ticker that will run the code every minute.
-	// Taken from https://gist.github.com/josephspurrier/ec57821bc4a3442a74ca
-	t := MinuteTicker()
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
 
-	for {
-		// Wait for ticker to send
-		<-t.C
-
-		// Update the ticker
-		t = MinuteTicker()
-
-		// Time in location
+	for range ticker.C {
 		locTime := time.Now().In(loc)
-
-		// Update timings everyday
-		if locTime.Hour() == 0 && locTime.Minute() == 1 {
-			pt = FetchPrayerTimes()
+		if isNewDay(locTime) {
+			pt = FetchPrayerTimes() // handle error appropriately
 		}
 
-		// Fajr
-		if locTime.Hour() == pt.Data.Timings.Fajr.Hour() && locTime.Minute() == pt.Data.Timings.Fajr.Minute() {
-			bot.sendMessage(fmt.Sprintf("حان وقت صلاة الفجر حسب توقيت مدينة %s", city))
-		}
+		checkAndSendPrayerAlerts(*bot, pt, locTime, city)
+		sendZikrEveryTwoHours(*bot, locTime)
+	}
+}
 
-		// Dhuhur
-		if locTime.Hour() == pt.Data.Timings.Dhuhr.Hour() && locTime.Minute() == pt.Data.Timings.Dhuhr.Minute() {
-			prayerName := "الظهر"
-			if pt.Data.Timings.Dhuhr.Weekday() == 5 {
-				prayerName = "الجمعة"
+func isNewDay(t time.Time) bool {
+	return t.Hour() == 0 && t.Minute() == 1
+}
+
+func checkAndSendPrayerAlerts(bot Bot, pt PrayerTimes, locTime time.Time, city string) {
+	timings := []struct {
+		Time             time.Time
+		Name             string
+		SpecialCondition func(time.Time) bool
+	}{
+		{pt.Data.Timings.Fajr, "الفجر", nil},
+		{pt.Data.Timings.Dhuhr, "الظهر", func(t time.Time) bool { return t.Weekday() == time.Friday }},
+		{pt.Data.Timings.Asr, "العصر", nil},
+		{pt.Data.Timings.Maghrib, "المغرب", nil},
+		{pt.Data.Timings.Isha, "العشاء", nil},
+		{pt.Data.Timings.LastThird, "الوتر", nil},
+	}
+
+	for _, timing := range timings {
+		if locTime.Hour() == timing.Time.Hour() && locTime.Minute() == timing.Time.Minute() {
+			message := fmt.Sprintf("حان وقت صلاة %s حسب توقيت مدينة %s", timing.Name, city)
+			if timing.SpecialCondition != nil && timing.SpecialCondition(locTime) {
+				message = fmt.Sprintf("حان وقت صلاة الجمعة حسب توقيت مدينة %s", city)
 			}
-			bot.sendMessage(fmt.Sprintf("حان وقت صلاة %s حسب توقيت مدينة %s", prayerName, city))
+			bot.sendMessage(message)
 		}
+	}
+}
 
-		// Asr
-		if locTime.Hour() == pt.Data.Timings.Asr.Hour() && locTime.Minute() == pt.Data.Timings.Asr.Minute() {
-			bot.sendMessage(fmt.Sprintf("حان وقت صلاة العصر حسب توقيت مدينة %s", city))
-		}
-
-		// Maghrib
-		if locTime.Hour() == pt.Data.Timings.Maghrib.Hour() && locTime.Minute() == pt.Data.Timings.Maghrib.Minute() {
-			bot.sendMessage(fmt.Sprintf("حان وقت صلاة المغرب حسب توقيت مدينة %s", city))
-		}
-
-		// Isha
-		if locTime.Hour() == pt.Data.Timings.Isha.Hour() && locTime.Minute() == pt.Data.Timings.Isha.Minute() {
-			bot.sendMessage(fmt.Sprintf("حان وقت صلاة العشاء حسب توقيت مدينة %s", city))
-		}
-
-		// Witr
-		if locTime.Hour() == pt.Data.Timings.LastThird.Hour() && locTime.Minute() == pt.Data.Timings.LastThird.Minute() {
-			bot.sendMessage(fmt.Sprintf("الوتر أحبتي ❤️"))
-		}
-
-		// Send Zikr every 2 hours
-		if (locTime.Hour()%4 == 0 || locTime.Hour()%4 == 2) && locTime.Minute() == 0 {
-			bot.sendMessage(FetchZikr())
-		}
+func sendZikrEveryTwoHours(bot Bot, locTime time.Time) {
+	if (locTime.Hour()%4 == 0 || locTime.Hour()%4 == 2) && locTime.Minute() == 0 {
+		bot.sendMessage(FetchZikr())
 	}
 }
